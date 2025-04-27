@@ -1,16 +1,22 @@
-# This is a sample Python script.
+# Main file
+import platform
+import os_test
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def greeting():
+    print(f"""
+    Welcome to Nmap!
+    Your platform: {platform.platform()}.
+    """)
+
+    if not os_test.is_nmap_installed():
+        print("    Nmap is not found. Please install Nmap and try again.")
+    else:
+        print("    Nmap is found.")
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def main():
+    greeting()
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main()
