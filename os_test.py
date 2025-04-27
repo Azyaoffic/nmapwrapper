@@ -1,6 +1,4 @@
 """Module, responsible for detecting OS as well as checking if nmap works."""
-
-import os
 import platform
 import subprocess
 
