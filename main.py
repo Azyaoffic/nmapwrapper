@@ -9,7 +9,9 @@ import os_test
 
 CURRENT = {
     "target": None,
-    "targetType": None
+    "targetType": None,
+    "protocol": "TCP",
+    "scanType": "connect",
 }
 
 # ------------------
@@ -67,6 +69,67 @@ def set_target():
             print("Invalid choice. Please try again.")
 
 
+def set_scan_type():
+    print("""
+    Please select the protocol:
+    [1] TCP
+    [2] UDP
+    """)
+    while True:
+        choice = input("Select your protocol: ")
+        if choice == "1":
+            CURRENT["protocol"] = "TCP"
+            break
+        elif choice == "2":
+            CURRENT["protocol"] = "UDP"
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+    if CURRENT["protocol"] == "UDP":
+        CURRENT["scanType"] = "UDP"
+    elif CURRENT["protocol"] == "TCP":
+        print("""
+        Please select the scan type:
+        [1] Connect
+        [2] SYN
+        [3] ACK
+        [4] Window Scan
+        [5] Maimon Scan
+        [6] Null Scan
+        [7] FIN Scan
+        [8] Xmas Scan
+        """)
+        while True:
+            choice = input("Select your scan type: ")
+            match choice:
+                case "1":
+                    CURRENT["scanType"] = "connect"
+                    break
+                case "2":
+                    CURRENT["scanType"] = "SYN"
+                    break
+                case "3":
+                    CURRENT["scanType"] = "ACK"
+                    break
+                case "4":
+                    CURRENT["scanType"] = "Window"
+                    break
+                case "5":
+                    CURRENT["scanType"] = "Maimon"
+                    break
+                case "6":
+                    CURRENT["scanType"] = "Null"
+                    break
+                case "7":
+                    CURRENT["scanType"] = "FIN"
+                    break
+                case "8":
+                    CURRENT["scanType"] = "Xmas"
+                    break
+                case _:
+                    print("Invalid choice. Please try again.")
+
 # ------------------
 # Input block
 # ------------------
@@ -77,7 +140,7 @@ def parse_options(selected):
     if selected == "1":
         set_target()
     elif selected == "2":
-        pass
+        set_scan_type()
     elif selected == "3":
         pass
     elif selected == "e":
@@ -92,6 +155,7 @@ def parse_options(selected):
 def print_options():
     print(f"""
     [1] Set target (current: {CURRENT["target"]}) 
+    [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
     
     [E] Execute scan
     [Q] Quit
@@ -123,13 +187,34 @@ def construct_parameters():
     PARAMS = ""
 
     # Target
-    if CURRENT["targetType"] == "ip":
-        PARAMS += f" {CURRENT['target']}"
-    elif CURRENT["targetType"] == "file":
-        PARAMS += f" -iL {CURRENT['target']}"
-    elif CURRENT["targetType"] == "random":
-        PARAMS += f" -iR {CURRENT['target']}"
+    match CURRENT["targetType"]:
+        case "ip":
+            PARAMS += f" {CURRENT['target']}"
+        case "file":
+            PARAMS += f" -iL {CURRENT['target']}"
+        case "random":
+            PARAMS += f" -iR {CURRENT['target']}"
 
+    # Scan type
+    match CURRENT["scanType"]:
+        case "connect":
+            PARAMS += f" -sT"
+        case "SYN":
+            PARAMS += f" -sS"
+        case "ACK":
+            PARAMS += f" -sA"
+        case "Window":
+            PARAMS += f" -sW"
+        case "Maimon":
+            PARAMS += f" -sM"
+        case "Null":
+            PARAMS += f" -sN"
+        case "FIN":
+            PARAMS += f" -sF"
+        case "Xmas":
+            PARAMS += f" -sX"
+        case "UDP":
+            PARAMS += f" -sU"
 
 
 
@@ -138,7 +223,7 @@ def construct_parameters():
 
 def execute():
     params = construct_parameters()
-    command = f"nmap {params}"
+    command = f"nmap{params}"
     print(f"Executing command: {command}")
 
     output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
