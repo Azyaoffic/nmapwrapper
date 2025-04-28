@@ -1,6 +1,8 @@
 # Main file
 import os
 import platform
+import subprocess
+import sys
 from time import sleep
 
 import os_test
@@ -65,13 +67,24 @@ def set_target():
             print("Invalid choice. Please try again.")
 
 
+# ------------------
+# Input block
+# ------------------
+
+
 def parse_options(selected):
+    selected = selected.lower()
     if selected == "1":
         set_target()
     elif selected == "2":
         pass
     elif selected == "3":
         pass
+    elif selected == "e":
+        execute()
+    elif selected == "q":
+        print("Exiting...")
+        exit(0)
     else:
         print("Invalid option. Please try again.")
 
@@ -80,6 +93,8 @@ def print_options():
     print(f"""
     [1] Set target (current: {CURRENT["target"]}) 
     
+    [E] Execute scan
+    [Q] Quit
     """)
 
 def main():
@@ -98,6 +113,35 @@ def main():
         select = input("\n    Select option: ")
         parse_options(select)
 
+
+# ------------------
+# Constructor block
+# ------------------
+
+
+def construct_parameters():
+    PARAMS = ""
+
+    # Target
+    if CURRENT["targetType"] == "ip":
+        PARAMS += f" {CURRENT['target']}"
+    elif CURRENT["targetType"] == "file":
+        PARAMS += f" -iL {CURRENT['target']}"
+    elif CURRENT["targetType"] == "random":
+        PARAMS += f" -iR {CURRENT['target']}"
+
+
+
+
+    return PARAMS
+
+
+def execute():
+    params = construct_parameters()
+    command = f"nmap {params}"
+    print(f"Executing command: {command}")
+
+    output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
 
 if __name__ == "__main__":
     main()
