@@ -12,6 +12,7 @@ CURRENT = {
     "targetType": None,
     "protocol": "TCP",
     "scanType": "connect",
+    "ports": None,
 }
 
 # ------------------
@@ -130,6 +131,25 @@ def set_scan_type():
                 case _:
                     print("Invalid choice. Please try again.")
 
+
+def set_ports():
+    print("""
+    Please select the ports:
+    [1] Specific ports or range (ex: 22,https,1-1000)
+    [2] All ports
+    """)
+    while True:
+        choice = input("Select your ports: ")
+        if choice == "1":
+            ports = input("Enter the specific ports: ")
+            CURRENT["ports"] = f"{ports}"
+            break
+        elif choice == "2":
+            CURRENT["ports"] = "All ports"
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
 # ------------------
 # Input block
 # ------------------
@@ -142,7 +162,7 @@ def parse_options(selected):
     elif selected == "2":
         set_scan_type()
     elif selected == "3":
-        pass
+        set_ports()
     elif selected == "e":
         execute()
     elif selected == "q":
@@ -156,6 +176,7 @@ def print_options():
     print(f"""
     [1] Set target (current: {CURRENT["target"]}) 
     [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
+    [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
     
     [E] Execute scan
     [Q] Quit
@@ -215,6 +236,16 @@ def construct_parameters():
             PARAMS += f" -sX"
         case "UDP":
             PARAMS += f" -sU"
+
+    # Ports
+    if CURRENT["ports"] is not None:
+        if CURRENT["ports"] == "All ports":
+            PARAMS += f" -p-"
+        else:
+            PARAMS += f" -p {CURRENT['ports']}"
+    else:
+        print("    No ports were specified, scanning all ports.")
+        PARAMS += f" -p-"
 
 
 
