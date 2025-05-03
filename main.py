@@ -12,7 +12,9 @@ CURRENT = {
     "targetType": None,
     "protocol": "TCP",
     "scanType": "connect",
-    "ports": None,
+    "ports": "80",
+    "serviceScan": False,
+    "intensity": "7"
 }
 
 # ------------------
@@ -150,6 +152,40 @@ def set_ports():
         else:
             print("Invalid choice. Please try again.")
 
+
+def set_service_version_scan():
+    print("""
+    Please select the service version scan:
+    [0] Maximum power (OS scan, version detection, traceroute...)
+    [1] Enable
+    [2] Disable
+    """)
+    while True:
+        choice = input("Select your service version scan: ")
+        if choice == "1":
+            CURRENT["serviceScan"] = True
+            break
+        elif choice == "2":
+            CURRENT["serviceScan"] = False
+            break
+        elif choice == "0":
+            CURRENT["serviceScan"] = True
+            CURRENT["intensity"] = "10"
+        else:
+            print("Invalid choice. Please try again.")
+
+    if CURRENT["serviceScan"] and CURRENT["intensity"] != "10":
+        while True:
+            intensity = input("Enter the intensity level (1-9): ")
+            if intensity.isdigit() and 1 <= int(intensity) <= 9:
+                CURRENT["intensity"] = intensity
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+
+
+
 # ------------------
 # Input block
 # ------------------
@@ -163,6 +199,8 @@ def parse_options(selected):
         set_scan_type()
     elif selected == "3":
         set_ports()
+    elif selected == "4":
+        set_service_version_scan()
     elif selected == "e":
         execute()
     elif selected == "q":
@@ -177,6 +215,7 @@ def print_options():
     [1] Set target (current: {CURRENT["target"]}) 
     [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
     [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
+    [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable)
     
     [E] Execute scan
     [Q] Quit
@@ -246,6 +285,13 @@ def construct_parameters():
     else:
         print("    No ports were specified, scanning all ports.")
         PARAMS += f" -p-"
+
+    # Service version scan
+    if CURRENT["serviceScan"]:
+        if CURRENT["intensity"] == "10":
+            PARAMS += f" -A"
+        else:
+            PARAMS += f" -sV --version-intensity {CURRENT['intensity']}"
 
 
 
