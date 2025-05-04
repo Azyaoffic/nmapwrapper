@@ -16,6 +16,7 @@ CURRENT = {
     "serviceScan": False,
     "intensity": "7",
     "OSDetection": False,
+    "timing": "3"
 }
 
 # ------------------
@@ -199,6 +200,38 @@ def set_service_version_scan():
             print("Invalid choice. Please try again.")
 
 
+def set_timing():
+    print("""
+    Please select the timing:
+    [0] Paranoid
+    [1] Sneaky
+    [2] Polite
+    [3] Normal
+    [4] Aggressive
+    [5] Insane
+    """)
+    while True:
+        choice = input("Select your timing: ")
+        if choice == "0":
+            CURRENT["timing"] = "0"
+            break
+        elif choice == "1":
+            CURRENT["timing"] = "1"
+            break
+        elif choice == "2":
+            CURRENT["timing"] = "2"
+            break
+        elif choice == "3":
+            CURRENT["timing"] = "3"
+            break
+        elif choice == "4":
+            CURRENT["timing"] = "4"
+            break
+        elif choice == "5":
+            CURRENT["timing"] = "5"
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
 
 # ------------------
@@ -216,6 +249,8 @@ def parse_options(selected):
         set_ports()
     elif selected == "4":
         set_service_version_scan()
+    elif selected == "t":
+        set_timing()
     elif selected == "e":
         execute()
     elif selected == "q":
@@ -230,8 +265,9 @@ def print_options():
     [1] Set target (current: {CURRENT["target"]}) 
     [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
     [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
-    [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable)
+    [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable. OS detection: {CURRENT["OSDetection"]} )
     
+    [T] Set timing/performance (current: {CURRENT["timing"]})
     [E] Execute scan
     [Q] Quit
     """)
@@ -312,7 +348,9 @@ def construct_parameters():
     if CURRENT["OSDetection"]:
         PARAMS += f" -O"
 
-
+    # Timing
+    if CURRENT["timing"] is not None:
+        PARAMS += f" -T{CURRENT['timing']}"
 
     return PARAMS
 
