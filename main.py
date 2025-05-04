@@ -16,8 +16,10 @@ CURRENT = {
     "serviceScan": False,
     "intensity": "7",
     "OSDetection": False,
-    "timing": "3"
+    "timing": "3",
+    "additional_params": ""
 }
+
 
 # ------------------
 # Printouts
@@ -43,6 +45,10 @@ def check_nmap():
 # ------------------
 # Functional block
 # ------------------
+
+def set_additional_params():
+    CURRENT["additional_params"] = input("Enter additional parameters (ex: -Pn -sV): ")
+
 
 def set_target():
     print("""
@@ -267,7 +273,9 @@ def print_options():
     [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
     [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable. OS detection: {CURRENT["OSDetection"]} )
     
+
     [T] Set timing/performance (current: {CURRENT["timing"]})
+    [A] Set additional parameters (current: {additional_params})
     [E] Execute scan
     [Q] Quit
     """)
@@ -351,6 +359,13 @@ def construct_parameters():
     # Timing
     if CURRENT["timing"] is not None:
         PARAMS += f" -T{CURRENT['timing']}"
+
+
+
+
+    # Additional parameters
+    if CURRENT["additional_params"] != "":
+        PARAMS += f" {CURRENT['additional_params']}"
 
     return PARAMS
 
