@@ -14,7 +14,8 @@ CURRENT = {
     "scanType": "connect",
     "ports": "80",
     "serviceScan": False,
-    "intensity": "7"
+    "intensity": "7",
+    "OSDetection": False,
 }
 
 # ------------------
@@ -183,6 +184,20 @@ def set_service_version_scan():
             else:
                 print("Invalid choice. Please try again.")
 
+    print("""
+    Do you want to enable OS detection? (Y/N)
+    """)
+    while True:
+        choice = input("Select your OS detection: ")
+        if choice.lower() == "y":
+            CURRENT["OSDetection"] = True
+            break
+        elif choice.lower() == "n":
+            CURRENT["OSDetection"] = False
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
 
 
 
@@ -292,6 +307,10 @@ def construct_parameters():
             PARAMS += f" -A"
         else:
             PARAMS += f" -sV --version-intensity {CURRENT['intensity']}"
+
+    # OS detection
+    if CURRENT["OSDetection"]:
+        PARAMS += f" -O"
 
 
 
