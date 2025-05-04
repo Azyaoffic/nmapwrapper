@@ -7,6 +7,8 @@ from time import sleep
 
 import os_test
 
+LAST_OUTPUT = []
+
 CURRENT = {
     "target": None,
     "targetType": None,
@@ -17,7 +19,9 @@ CURRENT = {
     "intensity": "7",
     "OSDetection": False,
     "timing": "3",
-    "additional_params": ""
+    "additional_params": "",
+    "output_option": "stdout",
+    "output_file": None,
 }
 
 
@@ -240,6 +244,39 @@ def set_timing():
             print("Invalid choice. Please try again.")
 
 
+def set_output_option():
+    print("""
+    Please select the output option:
+    [1] Standard (console) output
+    [2] Save to file (Text)
+    [3] Save to file (XML)
+    [4] Save to file (Grepable)
+    """)
+    while True:
+        choice = input("Select your output option: ")
+        if choice == "1":
+            CURRENT["output_option"] = "stdout"
+            CURRENT["output_file"] = None
+            break
+        elif choice == "2":
+            file_path = input("Enter the path to the output file: ")
+            CURRENT["output_option"] = "filetext"
+            CURRENT["output_file"] = file_path
+            break
+        elif choice == "3":
+            file_path = input("Enter the path to the output file: ")
+            CURRENT["output_option"] = "filexml"
+            CURRENT["output_file"] = file_path
+            break
+        elif choice == "4":
+            file_path = input("Enter the path to the output file: ")
+            CURRENT["output_option"] = "filegrepable"
+            CURRENT["output_file"] = file_path
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
 # ------------------
 # Input block
 # ------------------
@@ -255,6 +292,11 @@ def parse_options(selected):
         set_ports()
     elif selected == "4":
         set_service_version_scan()
+
+    elif selected == "o":
+        set_output_option()
+    elif selected == "a":
+        set_additional_params()
     elif selected == "t":
         set_timing()
     elif selected == "e":
@@ -273,9 +315,9 @@ def print_options():
     [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
     [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable. OS detection: {CURRENT["OSDetection"]} )
     
-
+    [O] Set output option (current: {CURRENT["output_option"]} with file {CURRENT["output_file"]} if applicable)
     [T] Set timing/performance (current: {CURRENT["timing"]})
-    [A] Set additional parameters (current: {additional_params})
+    [A] Set additional parameters (current: {CURRENT["additional_params"]})
     [E] Execute scan
     [Q] Quit
     """)
@@ -362,6 +404,28 @@ def construct_parameters():
 
 
 
+    # Output option
+    if CURRENT["output_option"] == "stdout":
+        pass
+    elif CURRENT["output_option"] == "filetext":
+        if CURRENT["output_file"] is not None:
+            PARAMS += f" -oN {CURRENT['output_file']}"
+        else:
+            print("    No output file was specified, using default.")
+            PARAMS += f" -oN nmap_output.txt"
+    elif CURRENT["output_option"] == "filexml":
+        if CURRENT["output_file"] is not None:
+            PARAMS += f" -oX {CURRENT['output_file']}"
+        else:
+            print("    No output file was specified, using default.")
+            PARAMS += f" -oX nmap_output.xml"
+    elif CURRENT["output_option"] == "filegrepable":
+        if CURRENT["output_file"] is not None:
+            PARAMS += f" -oG {CURRENT['output_file']}"
+        else:
+            print("    No output file was specified, using default.")
+            PARAMS += f" -oG nmap_output.gnmap"
+
 
     # Additional parameters
     if CURRENT["additional_params"] != "":
@@ -376,6 +440,9 @@ def execute():
     print(f"Executing command: {command}")
 
     output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+    if output.returncode == 0:
+        print("Scan completed successfully.")
+        LAST_OUTPUT.append([output.stdout])
 
 if __name__ == "__main__":
     main()
