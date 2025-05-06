@@ -7,7 +7,7 @@ from time import sleep
 
 import os_test
 
-LAST_OUTPUT = []
+LAST_PARAMS = []
 
 CURRENT = {
     "target": None,
@@ -304,6 +304,8 @@ def parse_options(selected):
     elif selected == "q":
         print("Exiting...")
         exit(0)
+    elif selected == "l":
+        execute_last()
     else:
         print("Invalid option. Please try again.")
 
@@ -320,6 +322,8 @@ def print_options():
     [A] Set additional parameters (current: {CURRENT["additional_params"]})
     [E] Execute scan
     [Q] Quit
+    
+    [L] Use last used parameters
     """)
 
 def main():
@@ -442,7 +446,29 @@ def execute():
     output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
     if output.returncode == 0:
         print("Scan completed successfully.")
-        LAST_OUTPUT.append([output.stdout])
+        LAST_PARAMS.clear()
+        LAST_PARAMS.append([output.stdout])
+
+    input("Press Enter to continue...")
+
+def execute_last():
+    if not LAST_PARAMS:
+        print("No last parameters found.")
+        input("Press Enter to continue...")
+        return
+
+    params = LAST_PARAMS[0]
+    command = f"nmap{params}"
+    print(f"Executing command: {command}")
+
+    output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
+    if output.returncode == 0:
+        print("Scan completed successfully.")
+        LAST_PARAMS.clear()
+        LAST_PARAMS.append([output.stdout])
+
+    input("Press Enter to continue...")
+
 
 if __name__ == "__main__":
     main()
