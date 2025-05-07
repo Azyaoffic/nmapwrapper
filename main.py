@@ -465,7 +465,7 @@ def execute_last():
     if output.returncode == 0:
         print("Scan completed successfully.")
         LAST_PARAMS.clear()
-        LAST_PARAMS.append([output.stdout])
+        LAST_PARAMS.append([params])
 
     input("Press Enter to continue...")
 
