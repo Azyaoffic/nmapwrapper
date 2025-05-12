@@ -5,7 +5,33 @@ import subprocess
 import sys
 from time import sleep
 
-import os_test
+# OS tests as well as nmap check
+def is_windows() -> bool:
+    """Check if the OS is Windows."""
+    return platform.system() == 'Windows'
+
+
+def is_linux() -> bool:
+    """Check if the OS is Linux."""
+    return platform.system() == 'Linux'
+
+
+def is_mac() -> bool:
+    """Check if the OS is Mac."""
+    return platform.system() == 'Darwin'
+
+
+def is_nmap_installed() -> bool:
+    """Check if nmap is installed."""
+    command = 'nmap -v'
+    try:
+        # Use subprocess to run the command and check for output
+        result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Check if nmap is installed by checking the return code
+        return result.returncode == 0
+    except Exception as e:
+        print(f"Error checking nmap installation: {e}")
+    return False
 
 LAST_PARAMS = []
 
@@ -14,7 +40,7 @@ CURRENT = {
     "targetType": None,
     "protocol": "TCP",
     "scanType": "connect",
-    "ports": "80",
+    "ports": "1-1000",
     "serviceScan": False,
     "intensity": "7",
     "OSDetection": False,
@@ -39,7 +65,7 @@ def greeting():
     """)
 
 def check_nmap():
-    if not os_test.is_nmap_installed():
+    if not is_nmap_installed():
         print("    Nmap is not found!")
         return False
     print("    Nmap is found!")
@@ -73,12 +99,12 @@ def set_target():
         elif choice == "2":
             CURRENT["targetType"] = "file"
             file_path = input("Enter the path to the file: ")
-            CURRENT["target"] = f"file at {file_path}"
+            CURRENT["target"] = f"{file_path}"
             break
         elif choice == "3":
             CURRENT["targetType"] = "random"
             num_targets = int(input("Enter the number of random targets: "))
-            CURRENT["target"] = f"{num_targets} random targets"
+            CURRENT["target"] = f"{num_targets}"
             break
         else:
             print("Invalid choice. Please try again.")
@@ -312,7 +338,7 @@ def parse_options(selected):
 
 def print_options():
     print(f"""
-    [1] Set target (current: {CURRENT["target"]}) 
+    [1] Set target (current: {CURRENT["target"]} {CURRENT["targetType"]}) 
     [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
     [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
     [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable. OS detection: {CURRENT["OSDetection"]} )
