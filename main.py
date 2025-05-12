@@ -36,8 +36,8 @@ def is_nmap_installed() -> bool:
 LAST_PARAMS = []
 
 CURRENT = {
-    "target": None,
-    "targetType": None,
+    "target": "localhost",
+    "targetType": "ip",
     "protocol": "TCP",
     "scanType": "connect",
     "ports": "1-1000",
@@ -466,14 +466,19 @@ def construct_parameters():
 
 def execute():
     params = construct_parameters()
-    command = f"nmap{params}"
+    command = f"nmap{params} -v"
     print(f"Executing command: {command}")
 
-    output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
-    if output.returncode == 0:
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in process.stdout:
+        print(line.decode().strip())
+    process.wait()
+    returncode = process.returncode
+
+    if returncode == 0:
         print("Scan completed successfully.")
         LAST_PARAMS.clear()
-        LAST_PARAMS.append([output.stdout])
+        LAST_PARAMS.append([params])
 
     input("Press Enter to continue...")
 
