@@ -5,6 +5,7 @@ import subprocess
 import sys
 from time import sleep
 
+
 # OS tests as well as nmap check
 def is_windows() -> bool:
     """Check if the OS is Windows."""
@@ -33,6 +34,7 @@ def is_nmap_installed() -> bool:
         print(f"Error checking nmap installation: {e}")
     return False
 
+
 LAST_PARAMS = []
 
 CURRENT = {
@@ -59,11 +61,13 @@ CURRENT = {
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
 def greeting():
     print(f"""
     Welcome to Nmap!
     Your platform: {platform.platform()}.
     """)
+
 
 def check_nmap():
     if not is_nmap_installed():
@@ -312,6 +316,7 @@ def set_output_option():
         else:
             print("Invalid choice. Please try again.")
 
+
 def set_profile():
     print("""
     Please select a scan profile:
@@ -348,7 +353,6 @@ def set_profile():
             break
         else:
             print("Invalid choice. Please try again.")
-
 
 
 # ------------------
@@ -407,6 +411,7 @@ def print_options():
     
     [L] Use last used parameters
     """)
+
 
 def main():
     greeting()
@@ -488,8 +493,6 @@ def construct_parameters():
     if CURRENT["timing"] is not None:
         PARAMS += f" -T{CURRENT['timing']}"
 
-
-
     # Output option
     if CURRENT["output_option"] == "stdout":
         pass
@@ -511,7 +514,6 @@ def construct_parameters():
         else:
             print("    No output file was specified, using default.")
             PARAMS += f" -oG nmap_output.gnmap"
-
 
     # Additional parameters
     if CURRENT["additional_params"] != "":
@@ -537,6 +539,7 @@ def execute():
         LAST_PARAMS.append([params])
 
     input("Press Enter to continue...")
+
 
 def execute_last():
     if not LAST_PARAMS:
