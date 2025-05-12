@@ -132,15 +132,15 @@ def set_scan_type():
         CURRENT["scanType"] = "UDP"
     elif CURRENT["protocol"] == "TCP":
         print("""
-        Please select the scan type:
-        [1] Connect
-        [2] SYN
-        [3] ACK
-        [4] Window Scan
-        [5] Maimon Scan
-        [6] Null Scan
-        [7] FIN Scan
-        [8] Xmas Scan
+        Please select the TCP scan type:
+        [1] Connect Scan: Basic and reliable, but easily detectable by firewalls.
+        [2] SYN Scan: Stealthier, doesn't complete the TCP handshake (requires root privileges).
+        [3] ACK Scan: Maps firewall rules, helps determine if ports are filtered.
+        [4] Window Scan: Similar to ACK, can sometimes identify open ports.
+        [5] Maimon Scan: A variant of FIN scan, may bypass some firewalls.
+        [6] Null Scan: No flags set, can evade some security measures.
+        [7] FIN Scan: Only FIN flag set, useful for identifying open ports on Unix systems.
+        [8] Xmas Scan: FIN, PSH, and URG flags set, helps identify open and closed ports.
         """)
         while True:
             choice = input("Select your scan type: ")
@@ -193,7 +193,7 @@ def set_ports():
 
     while True:
         topports = input("""
-        Do you want to use N top ports instead? (Y/N)
+Do you want to use N top ports instead? (Y/N)
         """)
 
         if topports.lower() == "y":
@@ -206,58 +206,55 @@ def set_ports():
 
 def set_service_version_scan():
     print("""
-    Please select the service version scan:
-    [0] Maximum power (OS scan, version detection, traceroute...)
-    [1] Enable
-    [2] Disable
+    Please select the scanning depth:
+    [1] Port scanning only (no version detection)
+    [2] Version detection on open ports
+    [3] Version detection with OS detection
+    [4] Comprehensive scan (version detection, OS detection, traceroute, and default scripts)
     """)
     while True:
         choice = input("Select your service version scan: ")
         if choice == "1":
-            CURRENT["serviceScan"] = True
-            break
-        elif choice == "2":
             CURRENT["serviceScan"] = False
             break
-        elif choice == "0":
+        elif choice == "2":
+            CURRENT["serviceScan"] = True
+            CURRENT["intensity"] = "7"
+            break
+        elif choice == "3":
+            CURRENT["serviceScan"] = True
+            CURRENT["intensity"] = "7"
+            CURRENT["OSDetection"] = True
+            break
+        elif choice == "4":
             CURRENT["serviceScan"] = True
             CURRENT["intensity"] = "10"
-        else:
-            print("Invalid choice. Please try again.")
+            CURRENT["OSDetection"] = True
+            CURRENT["additional_params"] += " -sC"
+            break
 
     if CURRENT["serviceScan"] and CURRENT["intensity"] != "10":
         while True:
-            intensity = input("Enter the intensity level (1-9): ")
+            intensity = input("""
+Input intensity for version detection:
+Enter a number from 1 (light, quick but less accurate) to 9 (aggressive, thorough but slower):
+            """)
             if intensity.isdigit() and 1 <= int(intensity) <= 9:
                 CURRENT["intensity"] = intensity
                 break
             else:
                 print("Invalid choice. Please try again.")
 
-    print("""
-    Do you want to enable OS detection? (Y/N)
-    """)
-    while True:
-        choice = input("Select your OS detection: ")
-        if choice.lower() == "y":
-            CURRENT["OSDetection"] = True
-            break
-        elif choice.lower() == "n":
-            CURRENT["OSDetection"] = False
-            break
-        else:
-            print("Invalid choice. Please try again.")
-
 
 def set_timing():
     print("""
-    Please select the timing:
-    [0] Paranoid
-    [1] Sneaky
-    [2] Polite
-    [3] Normal
-    [4] Aggressive
-    [5] Insane
+    Please select the timing template:
+    [0] Paranoid: Extremely slow, minimizes detection (best for stealth).
+    [1] Sneaky: Slower, reduces the chance of detection.
+    [2] Polite: Slower than normal, reduces network load.
+    [3] Normal: Default timing, suitable for most scans.
+    [4] Aggressive: Faster, increases network load.
+    [5] Insane: Very fast, may overwhelm the network or miss hosts.
     """)
     while True:
         choice = input("Select your timing: ")
