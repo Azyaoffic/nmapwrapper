@@ -41,6 +41,7 @@ CURRENT = {
     "protocol": "TCP",
     "scanType": "connect",
     "ports": "1-1000",
+    "topports": False,
     "serviceScan": False,
     "intensity": "7",
     "OSDetection": False,
@@ -190,6 +191,18 @@ def set_ports():
         else:
             print("Invalid choice. Please try again.")
 
+    while True:
+        topports = input("""
+        Do you want to use N top ports instead? (Y/N)
+        """)
+
+        if topports.lower() == "y":
+            CURRENT["topports"] = True
+            break
+        elif topports.lower() == "n":
+            CURRENT["topports"] = False
+            break
+
 
 def set_service_version_scan():
     print("""
@@ -302,6 +315,44 @@ def set_output_option():
         else:
             print("Invalid choice. Please try again.")
 
+def set_profile():
+    print("""
+    Please select a scan profile:
+    [1] Quick scan (100 top ports, TCP SYN, service detection)
+    [2] Full scan (all ports, TCP SYN, service detection)
+    [3] Stealth scan (1000 top ports, TCP SYN, no service detection)
+    [4] Vulnerability scan (--script vuln)
+    """)
+
+    while True:
+        choice = input("Select your scan profile: ")
+        if choice == "1":
+            CURRENT["profile"] = "TCP"
+            CURRENT["scanType"] = "SYN"
+            CURRENT["ports"] = "1-100"
+            CURRENT["topports"] = True
+            CURRENT["serviceScan"] = True
+            break
+        elif choice == "2":
+            CURRENT["profile"] = "TCP"
+            CURRENT["scanType"] = "SYN"
+            CURRENT["ports"] = "1-65535"
+            CURRENT["serviceScan"] = True
+            break
+        elif choice == "3":
+            CURRENT["profile"] = "TCP"
+            CURRENT["scanType"] = "SYN"
+            CURRENT["ports"] = "1-1000"
+            CURRENT["topports"] = True
+            CURRENT["serviceScan"] = False
+            break
+        elif choice == "4":
+            CURRENT["additional_params"] += " --script vuln"
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
 
 # ------------------
 # Input block
@@ -318,6 +369,10 @@ def parse_options(selected):
         set_ports()
     elif selected == "4":
         set_service_version_scan()
+
+    elif selected == "p":
+        set_profile()
+
 
     elif selected == "o":
         set_output_option()
@@ -340,11 +395,15 @@ def print_options():
     print(f"""
     [1] Set target (current: {CURRENT["target"]} {CURRENT["targetType"]}) 
     [2] Set scan type (current: {CURRENT["protocol"]} {CURRENT["scanType"]})
-    [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"})
+    [3] Set ports (current: {CURRENT["ports"] if "ports" in CURRENT else "not set"}. Using top ports: {CURRENT["topports"]} )
     [4] Set service scanning (current: {CURRENT["serviceScan"]} with intensity {CURRENT["intensity"]} if applicable. OS detection: {CURRENT["OSDetection"]} )
+    
+    [P] Select a scan profile
+    
     
     [O] Set output option (current: {CURRENT["output_option"]} with file {CURRENT["output_file"]} if applicable)
     [T] Set timing/performance (current: {CURRENT["timing"]})
+
     [A] Set additional parameters (current: {CURRENT["additional_params"]})
     [E] Execute scan
     [Q] Quit
