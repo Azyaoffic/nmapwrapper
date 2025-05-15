@@ -554,11 +554,12 @@ def execute_last():
     command = f"nmap{params} -v"
     print(f"Executing command: {command}")
 
-    output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
-    if output.returncode == 0:
+    try:
+        output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
         print("Scan completed successfully.")
-        LAST_PARAMS.clear()
-        LAST_PARAMS.append(params)
+
+    except subprocess.CalledProcessError:
+        print("Scan failed. Check your parameters or permissions.")
 
     input("Press Enter to continue...")
 
