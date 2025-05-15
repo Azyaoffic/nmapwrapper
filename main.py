@@ -148,33 +148,32 @@ def set_scan_type():
         """)
         while True:
             choice = input("Select your scan type: ")
-            match choice:
-                case "1":
-                    CURRENT["scanType"] = "connect"
-                    break
-                case "2":
-                    CURRENT["scanType"] = "SYN"
-                    break
-                case "3":
-                    CURRENT["scanType"] = "ACK"
-                    break
-                case "4":
-                    CURRENT["scanType"] = "Window"
-                    break
-                case "5":
-                    CURRENT["scanType"] = "Maimon"
-                    break
-                case "6":
-                    CURRENT["scanType"] = "Null"
-                    break
-                case "7":
-                    CURRENT["scanType"] = "FIN"
-                    break
-                case "8":
-                    CURRENT["scanType"] = "Xmas"
-                    break
-                case _:
-                    print("Invalid choice. Please try again.")
+            if choice == "1":
+                CURRENT["scanType"] = "connect"
+                break
+            elif choice == "2":
+                CURRENT["scanType"] = "SYN"
+                break
+            elif choice == "3":
+                CURRENT["scanType"] = "ACK"
+                break
+            elif choice == "4":
+                CURRENT["scanType"] = "Window"
+                break
+            elif choice == "5":
+                CURRENT["scanType"] = "Maimon"
+                break
+            elif choice == "6":
+                CURRENT["scanType"] = "Null"
+                break
+            elif choice == "7":
+                CURRENT["scanType"] = "FIN"
+                break
+            elif choice == "8":
+                CURRENT["scanType"] = "Xmas"
+                break
+            else:
+                print("Invalid choice. Please try again.")
 
 
 def set_ports():
@@ -327,20 +326,21 @@ def set_profile():
         if choice == "1":
             CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
-            CURRENT["ports"] = "1-100"
+            CURRENT["ports"] = "100"
             CURRENT["topports"] = True
             CURRENT["serviceScan"] = True
             break
         elif choice == "2":
             CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
-            CURRENT["ports"] = "1-65535"
+            CURRENT["ports"] = "All ports"
+            CURRENT["topports"] = False
             CURRENT["serviceScan"] = True
             break
         elif choice == "3":
             CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
-            CURRENT["ports"] = "1-1000"
+            CURRENT["ports"] = "1000"
             CURRENT["topports"] = True
             CURRENT["serviceScan"] = False
             break
@@ -435,34 +435,32 @@ def construct_parameters():
     PARAMS = ""
 
     # Target
-    match CURRENT["targetType"]:
-        case "ip":
-            PARAMS += f" {CURRENT['target']}"
-        case "file":
-            PARAMS += f" -iL {CURRENT['target']}"
-        case "random":
-            PARAMS += f" -iR {CURRENT['target']}"
+    if CURRENT["targetType"] == "ip":
+        PARAMS += f" {CURRENT['target']}"
+    elif CURRENT["targetType"] == "file":
+        PARAMS += f" -iL {CURRENT['target']}"
+    elif CURRENT["targetType"] == "random":
+        PARAMS += f" -iR {CURRENT['target']}"
 
     # Scan type
-    match CURRENT["scanType"]:
-        case "connect":
-            PARAMS += f" -sT"
-        case "SYN":
-            PARAMS += f" -sS"
-        case "ACK":
-            PARAMS += f" -sA"
-        case "Window":
-            PARAMS += f" -sW"
-        case "Maimon":
-            PARAMS += f" -sM"
-        case "Null":
-            PARAMS += f" -sN"
-        case "FIN":
-            PARAMS += f" -sF"
-        case "Xmas":
-            PARAMS += f" -sX"
-        case "UDP":
-            PARAMS += f" -sU"
+    elif CURRENT["scanType"] == "connect":
+        PARAMS += f" -sT"
+    elif CURRENT["scanType"] == "SYN":
+        PARAMS += f" -sS"
+    elif CURRENT["scanType"] == "ACK":
+        PARAMS += f" -sA"
+    elif CURRENT["scanType"] == "Window":
+        PARAMS += f" -sW"
+    elif CURRENT["scanType"] == "Maimon":
+        PARAMS += f" -sM"
+    elif CURRENT["scanType"] == "Null":
+        PARAMS += f" -sN"
+    elif CURRENT["scanType"] == "FIN":
+        PARAMS += f" -sF"
+    elif CURRENT["scanType"] == "Xmas":
+        PARAMS += f" -sX"
+    elif CURRENT["scanType"] == "UDP":
+        PARAMS += f" -sU"
 
     # Ports
     if CURRENT["topports"]:
