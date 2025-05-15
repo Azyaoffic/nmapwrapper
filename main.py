@@ -24,7 +24,7 @@ def is_mac() -> bool:
 
 def is_nmap_installed() -> bool:
     """Check if nmap is installed."""
-    command = 'nmap -v'
+    command = 'nmap --version'
     try:
         # Use subprocess to run the command and check for output
         result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
