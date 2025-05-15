@@ -325,20 +325,20 @@ def set_profile():
     while True:
         choice = input("Select your scan profile: ")
         if choice == "1":
-            CURRENT["profile"] = "TCP"
+            CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
             CURRENT["ports"] = "1-100"
             CURRENT["topports"] = True
             CURRENT["serviceScan"] = True
             break
         elif choice == "2":
-            CURRENT["profile"] = "TCP"
+            CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
             CURRENT["ports"] = "1-65535"
             CURRENT["serviceScan"] = True
             break
         elif choice == "3":
-            CURRENT["profile"] = "TCP"
+            CURRENT["protocol"] = "TCP"
             CURRENT["scanType"] = "SYN"
             CURRENT["ports"] = "1-1000"
             CURRENT["topports"] = True
