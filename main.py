@@ -182,30 +182,26 @@ def set_ports():
     Please select the ports:
     [1] Specific ports or range (ex: 22,https,1-1000)
     [2] All ports
+    [3] Top ports (most common ports)
     """)
     while True:
         choice = input("Select your ports: ")
         if choice == "1":
             ports = input("Enter the specific ports: ")
             CURRENT["ports"] = f"{ports}"
+            CURRENT["topports"] = False
             break
         elif choice == "2":
             CURRENT["ports"] = "All ports"
+            CURRENT["topports"] = False
+            break
+        elif choice == "3":
+            top_ports = input("Enter the number of top ports: ")
+            CURRENT["ports"] = f"{top_ports}"
+            CURRENT["topports"] = True
             break
         else:
             print("Invalid choice. Please try again.")
-
-    while True:
-        topports = input("""
-Do you want to use N top ports instead? (Y/N)
-        """)
-
-        if topports.lower() == "y":
-            CURRENT["topports"] = True
-            break
-        elif topports.lower() == "n":
-            CURRENT["topports"] = False
-            break
 
 
 def set_service_version_scan():
@@ -469,14 +465,21 @@ def construct_parameters():
             PARAMS += f" -sU"
 
     # Ports
-    if CURRENT["ports"] is not None:
-        if CURRENT["ports"] == "All ports":
-            PARAMS += f" -p-"
+    if CURRENT["topports"]:
+        if CURRENT["ports"]:
+            PARAMS += f" --top-ports {CURRENT['ports']}"
         else:
-            PARAMS += f" -p {CURRENT['ports']}"
+            print("    No top ports were specified, using default.")
+            PARAMS += f" --top-ports 100"
     else:
-        print("    No ports were specified, scanning all ports.")
-        PARAMS += f" -p-"
+        if CURRENT["ports"]:
+            if CURRENT["ports"] == "All ports":
+                PARAMS += f" -p-"
+            else:
+                PARAMS += f" -p {CURRENT['ports']}"
+        else:
+            print("    No ports were specified, scanning all ports.")
+            PARAMS += f" -p-"
 
     # Service version scan
     if CURRENT["serviceScan"]:
@@ -525,7 +528,7 @@ def construct_parameters():
 def execute():
     params = construct_parameters()
     command = f"nmap{params} -v"
-    print(f"Executing command: {command} -v")
+    print(f"Executing command: {command}")
 
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in process.stdout:
@@ -549,7 +552,7 @@ def execute_last():
 
     params = LAST_PARAMS[0]
     command = f"nmap{params} -v"
-    print(f"Executing command: {command} -v")
+    print(f"Executing command: {command}")
 
     output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
     if output.returncode == 0:
