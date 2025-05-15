@@ -525,7 +525,7 @@ def construct_parameters():
 def execute():
     params = construct_parameters()
     command = f"nmap{params} -v"
-    print(f"Executing command: {command}")
+    print(f"Executing command: {command} -v")
 
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in process.stdout:
@@ -536,7 +536,7 @@ def execute():
     if returncode == 0:
         print("Scan completed successfully.")
         LAST_PARAMS.clear()
-        LAST_PARAMS.append([params])
+        LAST_PARAMS.append(params)
 
     input("Press Enter to continue...")
 
@@ -548,14 +548,14 @@ def execute_last():
         return
 
     params = LAST_PARAMS[0]
-    command = f"nmap{params}"
-    print(f"Executing command: {command}")
+    command = f"nmap{params} -v"
+    print(f"Executing command: {command} -v")
 
     output = subprocess.run(command, shell=True, check=True, stdout=sys.stdout, stderr=sys.stderr)
     if output.returncode == 0:
         print("Scan completed successfully.")
         LAST_PARAMS.clear()
-        LAST_PARAMS.append([params])
+        LAST_PARAMS.append(params)
 
     input("Press Enter to continue...")
 
